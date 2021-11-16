@@ -70,5 +70,7 @@ class GenerateVueComponent extends GenerateAngularConstructBase
             sprintf('Vue component "%s" for plugin "%s" in "%s" generated', $component, $pluginName, $targetFile),
             sprintf('You should now build the vue library using the vue:build command (use --watch to continuously build after making changes).'),
         ));
+
+        return 0;
     }
 }

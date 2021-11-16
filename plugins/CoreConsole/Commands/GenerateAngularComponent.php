@@ -71,5 +71,7 @@ class GenerateAngularComponent extends GenerateAngularConstructBase
             sprintf('and the less file <comment>%1$s%2$s</comment>.', $pluginPath, $less1),
             'If you are not familiar with this have a look at <comment>https://developer.matomo.org/guides/working-with-piwiks-ui</comment>'
         ));
+
+        return 0;
     }
 }
