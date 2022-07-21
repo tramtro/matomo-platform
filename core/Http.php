@@ -195,6 +195,7 @@ class Http
             throw new Exception('Too many redirects (' . $followDepth . ')');
         }
 
+
         $aUrl = preg_replace('/[\x00-\x1F\x7F]/', '', trim($aUrl));
         $parsedUrl = @parse_url($aUrl);
 
@@ -992,6 +993,24 @@ class Http
             : 'Matomo/' . Version::VERSION;
     }
 
+    public static function getClientHintsFromServerVariables(): array
+    {
+        $clientHints = [];
+
+        foreach ($_SERVER as $key => $value) {
+            if (
+                0 === strpos(strtolower($key), strtolower('HTTP_SEC_CH_UA'))
+                || 'X_HTTP_REQUESTED_WITH' === strtoupper($key)
+            ) {
+                $clientHints[$key] = $value;
+            }
+        }
+
+        ksort($clientHints);
+
+        return $clientHints;
+    }
+
     /**
      * Fetches a file located at `$url` and saves it to `$destinationPath`.
      *
@@ -1108,5 +1127,17 @@ class Http
         }
 
         return array($proxyHost, $proxyPort, $proxyUser, $proxyPassword);
+    }
+
+    /**
+     * Checks the request is over SSL
+     * @return bool
+     */
+    public static function isUpdatingOverHttps()
+    {
+        $openSslEnabled = extension_loaded('openssl');
+        $usingMethodSupportingHttps = (Http::getTransportMethod() !== 'socket');
+
+        return $openSslEnabled && $usingMethodSupportingHttps;
     }
 }

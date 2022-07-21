@@ -729,7 +729,13 @@ $.extend(DataTable.prototype, UIControl.prototype, {
             }
 
             var piwikPeriods = piwikHelper.getAngularDependency('piwikPeriods');
-            var currentPeriod = piwikPeriods.parse(self.param['period'], self.param['date']);
+            if (self.param['dateUsedInGraph']) {
+                // this parameter is passed along when switching between periods. So we perfer using
+                // it, to avoid a change in the end date shown in the graph
+                var currentPeriod = piwikPeriods.parse('range', self.param['dateUsedInGraph']);
+            } else {
+                var currentPeriod = piwikPeriods.parse(self.param['period'], self.param['date']);
+            }
             var endDateOfPeriod = currentPeriod.getDateRange()[1];
             endDateOfPeriod = piwikPeriods.format(endDateOfPeriod);
 
@@ -1585,8 +1591,10 @@ $.extend(DataTable.prototype, UIControl.prototype, {
             tooltip.next().hover(function () {
                 var left = (-1 * tooltip.outerWidth() / 2) + th.width() / 2;
                 var top = -1 * tooltip.outerHeight();
-
                 var thPos = th.position();
+                var distance = tooltip.parent().offset().top;
+                var scroller = tooltip.closest('.dataTableScroller');
+
                 var thPosTop = 0;
 
                 if (thPos && thPos.top) {
@@ -1597,8 +1605,12 @@ $.extend(DataTable.prototype, UIControl.prototype, {
                 // headline
                 top = top + thPosTop;
 
+                if ($(window).scrollTop() >= distance - 100 || scroller.css('overflow-x')==='scroll') {
+                      top = tooltip.parent().outerHeight()
+                }
+
                 if (!th.next().length) {
-                    left = (-1 * tooltip.outerWidth()) + th.width() +
+                      left = (-1 * tooltip.outerWidth()) + th.width() +
                         parseInt(th.css('padding-right'), 10);
                 }
 
